@@ -1,1 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mein Clicker Game</title>
+</head>
 
+<body style="text-align:center; font-family:sans-serif;">
+
+<h1>Punkte: <span id="score">0</span></h1>
+<h3>Pro Klick: <span id="click">1</span></h3>
+<h3>Auto: <span id="auto">0</span>/sek</h3>
+
+<img id="ball" src="https://via.placeholder.com/120" onclick="clickBall()" style="cursor:pointer;">
+
+<br><br>
+
+<button onclick="upgradeClick()">Upgrade Klick (Kosten: <span id="costClick">10</span>)</button>
+<br><br>
+<button onclick="buyAuto()">Auto Clicker (Kosten: <span id="costAuto">50</span>)</button>
+<br><br>
+<button onclick="lucky()">🎁 Lucky Block (Kosten: 30)</button>
+
+<!-- SOUNDS -->
+<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+<audio id="upgradeSound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
+<audio id="luckySound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
+
+<script>
+let punkte = 0;
+let proKlick = 1;
+let auto = 0;
+
+let costClick = 10;
+let costAuto = 50;
+
+function play(id) {
+  let s = document.getElementById(id);
+  s.currentTime = 0;
+  s.play();
+}
+
+function clickBall() {
+  punkte += proKlick;
+  play("clickSound");
+  update();
+}
+
+function upgradeClick() {
+  if (punkte >= costClick) {
+    punkte -= costClick;
+    proKlick++;
+    costClick = Math.floor(costClick * 1.5);
+    play("upgradeSound");
+    update();
+  }
+}
+
+function buyAuto() {
+  if (punkte >= costAuto) {
+    punkte -= costAuto;
+    auto++;
+    costAuto = Math.floor(costAuto * 1.7);
+    play("upgradeSound");
+    update();
+  }
+}
+
+function lucky() {
+  if (punkte >= 30) {
+    punkte -= 30;
+    let r = Math.random();
+
+    play("luckySound");
+
+    if (r < 0.01) {
+      alert("🔥 LEGENDARY! +100 Punkte");
+      punkte += 100;
+    } 
+    else if (r < 0.2) {
+      alert("💎 Rare! +20 Punkte");
+      punkte += 20;
+    } 
+    else {
+      alert("🪨 Nichts Besonderes");
+    }
+
+    update();
+  }
+}
+
+// Auto income
+setInterval(() => {
+  punkte += auto;
+  update();
+}, 1000);
+
+// Save system
+function save() {
+  localStorage.setItem("punkte", punkte);
+  localStorage.setItem("proKlick", proKlick);
+  localStorage.setItem("auto", auto);
+  localStorage.setItem("costClick", costClick);
+  localStorage.setItem("costAuto", costAuto);
+}
+
+function load() {
+  punkte = parseInt(localStorage.getItem("punkte")) || 0;
+  proKlick = parseInt(localStorage.getItem("proKlick")) || 1;
+  auto = parseInt(localStorage.getItem("auto")) || 0;
+  costClick = parseInt(localStorage.getItem("costClick")) || 10;
+  costAuto = parseInt(localStorage.getItem("costAuto")) || 50;
+  update();
+}
+
+setInterval(save, 2000);
+window.onload = load;
+
+function update() {
+  document.getElementById("score").innerText = punkte;
+  document.getElementById("click").innerText = proKlick;
+  document.getElementById("auto").innerText = auto;
+  document.getElementById("costClick").innerText = costClick;
+  document.getElementById("costAuto").innerText = costAuto;
+}
+</script>
+
+</body>
+</html>
